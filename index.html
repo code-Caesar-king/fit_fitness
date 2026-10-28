@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitTrack - Diario de Entrenamientos</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Supabase JS CDN (SDK oficial v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- Contenedor de notificaciones Toast -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <div class="app-container">
+    <!-- Encabezado Principal -->
+    <header class="app-header">
+      <div class="logo-wrapper">
+        <span class="logo-icon">⚡</span>
+        <h1 class="app-title">FitTrack</h1>
+      </div>
+      <p class="app-subtitle">Tu diario minimalista de entrenamientos y progreso continuo</p>
+    </header>
+
+    <!-- Banner de configuración (se oculta automáticamente cuando se configuran las credenciales) -->
+    <div id="config-banner" class="banner banner-warning" style="display: none;">
+      <div class="banner-content">
+        <strong>⚠️ Configuración requerida:</strong> Agrega tus credenciales de Supabase en <code>app.js</code> (<code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code>) para comenzar a guardar datos.
+      </div>
+    </div>
+
+    <!-- Sección de Formulario (Tarjeta de Entrada) -->
+    <section class="card form-card">
+      <div class="card-header">
+        <h2 id="form-title" class="card-title">Nuevo Entrenamiento</h2>
+        <span id="edit-badge" class="badge badge-edit" style="display: none;">Modo Edición</span>
+      </div>
+
+      <form id="workout-form" class="workout-form" novalidate>
+        <!-- ID oculto para edición -->
+        <input type="hidden" id="training-id" value="">
+
+        <div class="form-grid">
+          <!-- Campo: Ejercicio -->
+          <div class="form-group col-span-2">
+            <label for="ejercicio">Ejercicio <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="ejercicio" 
+              name="ejercicio" 
+              placeholder="Ej. Press de banca, Sentadilla, Dominadas..." 
+              required
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- Campo: Series -->
+          <div class="form-group">
+            <label for="series">Series <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="series" 
+              name="series" 
+              placeholder="4" 
+              min="1" 
+              required
+            >
+          </div>
+
+          <!-- Campo: Repeticiones -->
+          <div class="form-group">
+            <label for="repeticiones">Repeticiones <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="repeticiones" 
+              name="repeticiones" 
+              placeholder="10" 
+              min="1" 
+              required
+            >
+          </div>
+
+          <!-- Campo: Peso -->
+          <div class="form-group">
+            <label for="peso">Peso (kg) <span class="optional">(opcional)</span></label>
+            <input 
+              type="number" 
+              id="peso" 
+              name="peso" 
+              placeholder="80.5" 
+              step="0.5" 
+              min="0"
+            >
+          </div>
+
+          <!-- Campo: Fecha -->
+          <div class="form-group">
+            <label for="fecha">Fecha <span class="required">*</span></label>
+            <input 
+              type="date" 
+              id="fecha" 
+              name="fecha" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Botones de Acción del Formulario -->
+        <div class="form-actions">
+          <button type="button" id="btn-cancel" class="btn btn-secondary" style="display: none;">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-submit" class="btn btn-primary">
+            <span class="btn-icon">+</span>
+            <span id="btn-submit-text">Guardar Entrenamiento</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Sección de Historial / Tabla -->
+    <section class="card table-card">
+      <div class="card-header table-header-flex">
+        <div>
+          <h2 class="card-title">Historial de Entrenamientos</h2>
+          <p class="card-description">Tus registros organizados cronológicamente</p>
+        </div>
+        <div class="counter-badge" id="workout-count">0 registros</div>
+      </div>
+
+      <!-- Estado de Carga -->
+      <div id="loading-state" class="state-container" style="display: none;">
+        <div class="spinner"></div>
+        <p>Cargando entrenamientos desde Supabase...</p>
+      </div>
+
+      <!-- Estado Vacío -->
+      <div id="empty-state" class="state-container" style="display: none;">
+        <div class="empty-icon">📋</div>
+        <h3>No hay entrenamientos aún</h3>
+        <p>Comienza completando el formulario superior para registrar tu primera sesión de entrenamiento.</p>
+      </div>
+
+      <!-- Tabla de Entrenamientos -->
+      <div class="table-responsive" id="table-wrapper">
+        <table class="workout-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Ejercicio</th>
+              <th class="text-center">Series</th>
+              <th class="text-center">Reps</th>
+              <th class="text-right">Peso</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="workout-list">
+            <!-- Filas dinámicas generadas en app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer Minimalista -->
+    <footer class="app-footer">
+      <p>FitTrack &copy; Diario de Entrenamientos personal conectado a Supabase.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
